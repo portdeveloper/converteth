@@ -50,7 +50,7 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
         <div className="flex flex-col items-center">
           <div className="bg-gray-200 relative p-5 mt-16 font-mono text-gray-800 border-2 border-black my-5 shadow-lg flex flex-col justify-end">
             <Image
-              src="/converteth.png"
+              src="/converteth.svg"
               alt="converteth"
               width={300}
               height={150}
