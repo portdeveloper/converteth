@@ -1,25 +1,40 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 const MAJOR_COINS = ["BTC", "ETH", "OP", "MATIC", "MKR"];
 
-export const ConvertAndShow = ({ data }: { data: any }) => {
-  const [amount, setAmount] = useState<any>("1");
-  const [selectedCurrency, setSelectedCurrency] = useState("BTC");
-  const [displayedCoins, setDisplayedCoins] = useState<string[]>(MAJOR_COINS);
+interface CryptoQuote {
+  price: number;
+}
 
-  const prices = data.reduce((acc: any, curr: any) => {
+interface CryptoData {
+  id: string;
+  symbol: string;
+  quote: { USD: CryptoQuote };
+}
+
+interface ConvertAndShowProps {
+  data: CryptoData[];
+}
+
+export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
+  const [amount, setAmount] = useState("1");
+  const [selectedCurrency, setSelectedCurrency] = useState("BTC");
+  const [displayedCoins, setDisplayedCoins] = useState(MAJOR_COINS);
+
+  const prices = data.reduce((acc: Record<string, number>, curr: CryptoData) => {
     acc[curr.symbol] = curr.quote.USD.price;
     return acc;
-  }, {});
+  }, {} as Record<string, number>);
 
-  const convertedAmounts = displayedCoins.reduce((acc: any, curr) => {
-    if (curr !== selectedCurrency) {
-      acc[curr] = ((amount * prices[selectedCurrency]) / prices[curr]).toFixed(2);
+  const convertedAmounts = displayedCoins.reduce((acc: Record<string, string>, curr: string) => {
+    if (curr !== selectedCurrency && prices[selectedCurrency] && prices[curr]) {
+      acc[curr] = ((parseFloat(amount) * prices[selectedCurrency]) / prices[curr]).toFixed(2);
     }
     return acc;
-  }, {});
+  }, {} as Record<string, string>);
 
   const addCoinToShow = (symbol: string) => {
     if (!displayedCoins.includes(symbol)) {
@@ -27,65 +42,84 @@ export const ConvertAndShow = ({ data }: { data: any }) => {
     }
   };
 
-  const coinsToAdd = data.filter((coin: any) => !displayedCoins.includes(coin.symbol));
+  const coinsToAdd = data.filter(coin => !displayedCoins.includes(coin.symbol));
 
   return (
-    <div className="flex w-full">
-      <div className="shrink max-w-xs">
-        <div className="flex flex-col items-center bg-gray-200 p-5 font-mono text-gray-800 border-2 border-black m-5 shadow-lg">
-          <input
-            type="number"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            placeholder="Enter amount"
-            className="mb-4 p-2 border-2 border-black bg-white text-black"
-          />
-          <select
-            value={selectedCurrency}
-            onChange={e => setSelectedCurrency(e.target.value)}
-            className="mb-4 p-2 bg-white text-black font-mono border-2 border-black"
-          >
-            {data.map((crypto: any) => (
-              <option key={crypto.id} value={crypto.symbol}>
-                {crypto.symbol}
-              </option>
-            ))}
-          </select>
-          <select
-            onChange={e => addCoinToShow(e.target.value)}
-            className="mb-4 p-2 bg-white text-black font-mono border-2 border-black"
-            defaultValue=""
-          >
-            <option value="" disabled>
-              Add Coin to Show
-            </option>
-            {coinsToAdd.map((crypto: any) => (
-              <option key={crypto.id} value={crypto.symbol}>
-                {crypto.symbol}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="font-mono text-black p-2 m-5 text-center border-2 border-black bg-gray-200">
-          {selectedCurrency}: ${prices[selectedCurrency]}
-        </div>
-      </div>
+    <div className="container mx-auto px-4 mt-8">
+      <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center">
+          <div className="bg-gray-200 relative p-5 mt-16 font-mono text-gray-800 border-2 border-black my-5 shadow-lg flex flex-col justify-end">
+            <Image
+              src="/converteth.png"
+              alt="converteth"
+              width={300}
+              height={150}
+              objectFit="contain"
+              className="absolute -top-36 left-0"
+            />
+            <input
+              type="number"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              placeholder="Enter amount"
+              className="p-2 z-50 border-2 border-black bg-white text-black mb-4 mt-16"
+            />
+            <select
+              value={selectedCurrency}
+              onChange={e => setSelectedCurrency(e.target.value)}
+              className="p-2 bg-white text-black font-mono border-2 border-black mb-4"
+            >
+              {data.map(crypto => (
+                <option key={crypto.id} value={crypto.symbol}>
+                  {crypto.symbol}
+                </option>
+              ))}
+            </select>
 
-      <div className="flex-1 flex flex-wrap overflow-y-auto justify-center">
-        {amount > 0 &&
-          displayedCoins.map(
-            symbol =>
-              convertedAmounts[symbol] && (
-                <div
-                  key={symbol}
-                  className="font-mono text-black p-2 m-5 border-2 border-black bg-gray-200 text-center flex-none w-32 h-32 flex items-center justify-center"
-                >
-                  <p>
-                    {symbol}: {convertedAmounts[symbol]}
-                  </p>
-                </div>
-              ),
+            <div className="text-black p-2 text-center border-2 border-black bg-gray-200 mb-4">
+              {selectedCurrency}: ${prices[selectedCurrency]}
+            </div>
+            <label>add coin to show</label>
+            <select
+              onChange={e => addCoinToShow(e.target.value)}
+              className="p-2 bg-white text-black font-mono border-2 border-black "
+              defaultValue=""
+            >
+              <option value="" disabled>
+                Add coin to show
+              </option>
+              {coinsToAdd.map(crypto => (
+                <option key={crypto.id} value={crypto.symbol}>
+                  {crypto.symbol}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="flex flex-col items-center">
+          {amount && (
+            <p className="font-bold text-lg m-0">
+              {amount} {selectedCurrency} is...
+            </p>
           )}
+          <div className="flex flex-wrap justify-center items-center">
+            {Number(amount) > 0 &&
+              displayedCoins.map(
+                symbol =>
+                  convertedAmounts[symbol] && (
+                    <div
+                      key={symbol}
+                      className="font-mono text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex items-center justify-center"
+                      style={{ width: "8rem", height: "8rem" }}
+                    >
+                      <p>
+                        {convertedAmounts[symbol]} {symbol}
+                      </p>
+                    </div>
+                  ),
+              )}
+          </div>
+        </div>
       </div>
     </div>
   );

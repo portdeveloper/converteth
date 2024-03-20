@@ -32,7 +32,7 @@ const Home: NextPage = async () => {
 
   return (
     <>
-      <div className="flex items-center justify-center flex-col flex-grow pt-10">
+      <div className="flex items-center  flex-col flex-grow pt-10">
         <ConvertAndShow data={data.data} />
       </div>
     </>
