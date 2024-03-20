@@ -8,6 +8,7 @@ export const ConvertAndShow = ({ data }: { data: any }) => {
   const [amount, setAmount] = useState<any>("1");
   const [selectedCurrency, setSelectedCurrency] = useState("BTC");
   const [displayedCoins, setDisplayedCoins] = useState<string[]>(MAJOR_COINS);
+  const [addCoinValue, setAddCoinValue] = useState("");
 
   const prices = data.reduce((acc: any, curr: any) => {
     acc[curr.symbol] = curr.quote.USD.price;
@@ -24,6 +25,7 @@ export const ConvertAndShow = ({ data }: { data: any }) => {
   const addCoinToShow = (symbol: string) => {
     if (!displayedCoins.includes(symbol)) {
       setDisplayedCoins(prevCoins => [...prevCoins, symbol]);
+      setAddCoinValue("");
     }
   };
 
@@ -38,12 +40,12 @@ export const ConvertAndShow = ({ data }: { data: any }) => {
             value={amount}
             onChange={e => setAmount(e.target.value)}
             placeholder="Enter amount"
-            className="mb-4 p-2 border-2 border-black bg-white text-black"
+            className="mb-4 p-2 border-2 border-black bg-white text-black w-full"
           />
           <select
             value={selectedCurrency}
             onChange={e => setSelectedCurrency(e.target.value)}
-            className="mb-4 p-2 bg-white text-black font-mono border-2 border-black"
+            className="mb-4 p-2 bg-white text-black font-mono border-2 border-black w-full"
           >
             {data.map((crypto: any) => (
               <option key={crypto.id} value={crypto.symbol}>
@@ -52,8 +54,9 @@ export const ConvertAndShow = ({ data }: { data: any }) => {
             ))}
           </select>
           <select
+            value={addCoinValue}
             onChange={e => addCoinToShow(e.target.value)}
-            className="mb-4 p-2 bg-white text-black font-mono border-2 border-black"
+            className="mb-4 p-2 bg-white text-black font-mono border-2 border-black w-full"
             defaultValue=""
           >
             <option value="" disabled>
