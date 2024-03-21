@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 
 const MAJOR_COINS = ["BTC", "ETH", "OP", "MATIC", "MKR"];
@@ -24,17 +24,21 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
   const [selectedCurrency, setSelectedCurrency] = useState("BTC");
   const [displayedCoins, setDisplayedCoins] = useState(MAJOR_COINS);
 
-  const prices = data.reduce((acc: Record<string, number>, curr: CryptoData) => {
-    acc[curr.symbol] = curr.quote.USD.price;
-    return acc;
-  }, {} as Record<string, number>);
+  const prices = useMemo(() => {
+    return data.reduce((acc: Record<string, number>, curr: CryptoData) => {
+      acc[curr.symbol] = curr.quote.USD.price;
+      return acc;
+    }, {});
+  }, [data]);
 
-  const convertedAmounts = displayedCoins.reduce((acc: Record<string, string>, curr: string) => {
-    if (curr !== selectedCurrency && prices[selectedCurrency] && prices[curr]) {
-      acc[curr] = ((parseFloat(amount) * prices[selectedCurrency]) / prices[curr]).toFixed(2);
-    }
-    return acc;
-  }, {} as Record<string, string>);
+  const convertedAmounts = useMemo(() => {
+    return displayedCoins.reduce((acc: Record<string, string>, curr: string) => {
+      if (curr !== selectedCurrency && prices[selectedCurrency] && prices[curr]) {
+        acc[curr] = ((parseFloat(amount) * prices[selectedCurrency]) / prices[curr]).toFixed(2);
+      }
+      return acc;
+    }, {});
+  }, [amount, selectedCurrency, displayedCoins, prices]);
 
   const addCoinToShow = (symbol: string) => {
     if (!displayedCoins.includes(symbol)) {
