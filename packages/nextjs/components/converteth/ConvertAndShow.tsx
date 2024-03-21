@@ -42,7 +42,9 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
     }
   };
 
-  const coinsToAdd = data.filter(coin => !displayedCoins.includes(coin.symbol));
+  const coinsToAdd = data
+    .filter(coin => !displayedCoins.includes(coin.symbol))
+    .sort((a, b) => a.symbol.localeCompare(b.symbol));
 
   return (
     <div className="container mx-auto px-4 mt-8">
