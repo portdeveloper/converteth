@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useLocalStorage } from "usehooks-ts";
 
 const MAJOR_COINS = ["BTC", "ETH", "OP", "MATIC", "MKR"];
 
@@ -19,10 +20,23 @@ interface ConvertAndShowProps {
   data: CryptoData[];
 }
 
+const LOCAL_STORAGE_KEY = "cryptoPreferences";
+
 export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
-  const [amount, setAmount] = useState("1");
-  const [selectedCurrency, setSelectedCurrency] = useState("BTC");
-  const [displayedCoins, setDisplayedCoins] = useState(MAJOR_COINS);
+  const [localStoredvalue, setLocalStoredvalue] = useLocalStorage(
+    LOCAL_STORAGE_KEY,
+    {
+      baseCurrency: "BTC",
+      displayedCoins: MAJOR_COINS,
+      amount: "1",
+    },
+    {
+      initializeWithValue: true,
+    },
+  );
+  const [amount, setAmount] = useState(localStoredvalue.amount);
+  const [selectedCurrency, setSelectedCurrency] = useState(localStoredvalue.baseCurrency);
+  const [displayedCoins, setDisplayedCoins] = useState(localStoredvalue.displayedCoins);
 
   const prices = data.reduce((acc: Record<string, number>, curr: CryptoData) => {
     acc[curr.symbol] = curr.quote.USD.price;
@@ -43,6 +57,11 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
   };
 
   const coinsToAdd = data.filter(coin => !displayedCoins.includes(coin.symbol));
+
+  // Effect to update LocalStorage when preferences change
+  useEffect(() => {
+    setLocalStoredvalue({ baseCurrency: selectedCurrency, displayedCoins, amount });
+  }, [selectedCurrency, displayedCoins, amount]);
 
   return (
     <div className="container mx-auto px-4 mt-8">
