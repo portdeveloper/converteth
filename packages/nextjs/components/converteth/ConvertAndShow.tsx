@@ -46,6 +46,10 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
     }
   };
 
+  const removeCoinToShow = (symbol: string) => {
+    setDisplayedCoins(prevCoins => prevCoins.filter(coin => coin !== symbol));
+  };
+
   const coinsToAdd = data
     .filter(coin => !displayedCoins.includes(coin.symbol))
     .sort((a, b) => a.symbol.localeCompare(b.symbol));
@@ -113,8 +117,14 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
                   convertedAmounts[symbol] && (
                     <div
                       key={symbol}
-                      className="font-mono h-32 w-32 text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex items-center justify-center"
+                      className="relative font-mono h-32 w-32 text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex flex-col items-center justify-center"
                     >
+                      <button
+                        onClick={() => removeCoinToShow(symbol)}
+                        className="absolute right-2 top-0 text-xl hover:text-red-500"
+                      >
+                        X
+                      </button>
                       <p>
                         {convertedAmounts[symbol]} {symbol}
                       </p>
