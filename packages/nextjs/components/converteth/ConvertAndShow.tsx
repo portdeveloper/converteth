@@ -54,6 +54,40 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
     .filter(coin => !displayedCoins.includes(coin.symbol))
     .sort((a, b) => a.symbol.localeCompare(b.symbol));
 
+  const [inputTextResponse, setInputTextResponse] = useState<string>();
+  const [inputTextClassName, setInputTextClassName] = useState<string>();
+
+  function onSubmit(event: any) {
+    event.preventDefault();
+    const target = event.target;
+    console.log(target.input.value);
+
+    let isPresent = false;
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].symbol === target.input.value) {
+        isPresent = true;
+        break;
+      }
+    }
+
+    if (!isPresent) {
+      setInputTextClassName("text-red-600");
+      setInputTextResponse(`${target.input.value} is not a supported token!`);
+      return;
+    }
+
+    if (displayedCoins.includes(target.input.value)) {
+      setInputTextClassName("text-red-600");
+      setInputTextResponse(`${target.input.value} is already being tracked!`);
+      return;
+    }
+
+    setInputTextClassName("text-green-600");
+    setInputTextResponse(`Succesfully added ${target.input.value}!`);
+    setDisplayedCoins(prevCoins => [...prevCoins, target.input.value]);
+  }
+
   return (
     <div className="container mx-auto px-4 mt-8">
       <div className="flex flex-col items-center justify-center">
@@ -102,6 +136,17 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
                 </option>
               ))}
             </select>
+
+            <form onSubmit={onSubmit} className="border-2 border-black flex flex-col p-2 m-2">
+              <p className="text-center">Add coin</p>
+              <input
+                name="input"
+                type="text"
+                className="m-1 p-2 bg-white text-black font-mono botder-2 border-black"
+              ></input>
+              <button className="m-1 bg-white border-2 border-black">Add</button>
+              <p className={inputTextClassName}>{inputTextResponse}</p>
+            </form>
           </div>
         </div>
         <div className="flex flex-col items-center">
