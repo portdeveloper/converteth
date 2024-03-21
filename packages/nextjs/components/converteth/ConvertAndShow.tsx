@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+
 import Image from "next/image";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -38,17 +39,21 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
   const [selectedCurrency, setSelectedCurrency] = useState(localStoredvalue.baseCurrency);
   const [displayedCoins, setDisplayedCoins] = useState(localStoredvalue.displayedCoins);
 
-  const prices = data.reduce((acc: Record<string, number>, curr: CryptoData) => {
-    acc[curr.symbol] = curr.quote.USD.price;
-    return acc;
-  }, {} as Record<string, number>);
+  const prices = useMemo(() => {
+    return data.reduce((acc: Record<string, number>, curr: CryptoData) => {
+      acc[curr.symbol] = curr.quote.USD.price;
+      return acc;
+    }, {});
+  }, [data]);
 
-  const convertedAmounts = displayedCoins.reduce((acc: Record<string, string>, curr: string) => {
-    if (curr !== selectedCurrency && prices[selectedCurrency] && prices[curr]) {
-      acc[curr] = ((parseFloat(amount) * prices[selectedCurrency]) / prices[curr]).toFixed(2);
-    }
-    return acc;
-  }, {} as Record<string, string>);
+  const convertedAmounts = useMemo(() => {
+    return displayedCoins.reduce((acc: Record<string, string>, curr: string) => {
+      if (curr !== selectedCurrency && prices[selectedCurrency] && prices[curr]) {
+        acc[curr] = ((parseFloat(amount) * prices[selectedCurrency]) / prices[curr]).toFixed(2);
+      }
+      return acc;
+    }, {});
+  }, [amount, selectedCurrency, displayedCoins, prices]);
 
   const addCoinToShow = (symbol: string) => {
     if (!displayedCoins.includes(symbol)) {
@@ -56,7 +61,13 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
     }
   };
 
-  const coinsToAdd = data.filter(coin => !displayedCoins.includes(coin.symbol));
+  const removeCoinToShow = (symbol: string) => {
+    setDisplayedCoins(prevCoins => prevCoins.filter(coin => coin !== symbol));
+  };
+
+  const coinsToAdd = data
+    .filter(coin => !displayedCoins.includes(coin.symbol))
+    .sort((a, b) => a.symbol.localeCompare(b.symbol));
 
   // Effect to update LocalStorage when preferences change
   useEffect(() => {
@@ -73,7 +84,6 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
               alt="converteth"
               width={300}
               height={150}
-              objectFit="contain"
               className="absolute -top-36 left-0"
             />
             <input
@@ -99,11 +109,10 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
             <div className="text-black p-2 text-center border-2 border-black bg-gray-200 mb-4">
               {selectedCurrency}: ${prices[selectedCurrency]}
             </div>
-            <label>add coin to show</label>
             <select
               onChange={e => addCoinToShow(e.target.value)}
               className="p-2 bg-white text-black font-mono border-2 border-black "
-              defaultValue=""
+              value={""}
             >
               <option value="" disabled>
                 Add coin to show
@@ -129,9 +138,14 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
                   convertedAmounts[symbol] && (
                     <div
                       key={symbol}
-                      className="font-mono text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex items-center justify-center"
-                      style={{ width: "8rem", height: "8rem" }}
+                      className="relative font-mono h-32 w-32 text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex flex-col items-center justify-center"
                     >
+                      <button
+                        onClick={() => removeCoinToShow(symbol)}
+                        className="absolute right-2 top-0 text-xl hover:text-red-500"
+                      >
+                        X
+                      </button>
                       <p>
                         {convertedAmounts[symbol]} {symbol}
                       </p>

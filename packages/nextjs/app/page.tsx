@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import { ConvertAndShow } from "~~/components/converteth/ConvertAndShow";
 
 async function getData() {
-  const api_key = process.env.NEXT_PUBLIC_CMC_API_KEY; // Store API key in .env.local file without NEXT_PUBLIC_ prefix
+  const api_key = process.env.NEXT_PUBLIC_CMC_API_KEY;
   const url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
 
   if (!api_key) {
@@ -16,11 +16,8 @@ async function getData() {
     },
     next: { revalidate: 30 },
   });
-  // The return value is *not* serialized
-  // You can return Date, Map, Set, etc.
 
   if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
     throw new Error("Failed to fetch data");
   }
 
