@@ -1,7 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+
 import Image from "next/image";
+import { useLocalStorage } from "usehooks-ts";
 
 const MAJOR_COINS = ["BTC", "ETH", "OP", "MATIC", "MKR"];
 
@@ -19,10 +21,23 @@ interface ConvertAndShowProps {
   data: CryptoData[];
 }
 
+const LOCAL_STORAGE_KEY = "cryptoPreferences";
+
 export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
-  const [amount, setAmount] = useState("1");
-  const [selectedCurrency, setSelectedCurrency] = useState("BTC");
-  const [displayedCoins, setDisplayedCoins] = useState(MAJOR_COINS);
+  const [localStoredvalue, setLocalStoredvalue] = useLocalStorage(
+    LOCAL_STORAGE_KEY,
+    {
+      baseCurrency: "BTC",
+      displayedCoins: MAJOR_COINS,
+      amount: "1",
+    },
+    {
+      initializeWithValue: true,
+    },
+  );
+  const [amount, setAmount] = useState(localStoredvalue.amount);
+  const [selectedCurrency, setSelectedCurrency] = useState(localStoredvalue.baseCurrency);
+  const [displayedCoins, setDisplayedCoins] = useState(localStoredvalue.displayedCoins);
 
   const prices = useMemo(() => {
     return data.reduce((acc: Record<string, number>, curr: CryptoData) => {
@@ -54,6 +69,11 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
     .filter(coin => !displayedCoins.includes(coin.symbol))
     .sort((a, b) => a.symbol.localeCompare(b.symbol));
 
+  // Effect to update LocalStorage when preferences change
+  useEffect(() => {
+    setLocalStoredvalue({ baseCurrency: selectedCurrency, displayedCoins, amount });
+  }, [selectedCurrency, displayedCoins, amount, setLocalStoredvalue]);
+
   return (
     <div className="container mx-auto px-4 mt-8">
       <div className="flex flex-col items-center justify-center">
@@ -70,6 +90,7 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
               type="number"
               value={amount}
               onChange={e => setAmount(e.target.value)}
+              min="0"
               placeholder="Enter amount"
               className="p-2 z-50 border-2 border-black bg-white text-black mb-4 mt-16"
             />
