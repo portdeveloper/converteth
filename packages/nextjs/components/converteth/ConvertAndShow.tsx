@@ -113,8 +113,7 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
                   convertedAmounts[symbol] && (
                     <div
                       key={symbol}
-                      className="font-mono text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex items-center justify-center"
-                      style={{ width: "8rem", height: "8rem" }}
+                      className="font-mono h-32 w-32 text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex items-center justify-center"
                     >
                       <p>
                         {convertedAmounts[symbol]} {symbol}
