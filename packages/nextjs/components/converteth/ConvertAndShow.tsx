@@ -110,7 +110,7 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
                   convertedAmounts[symbol] && (
                     <div
                       key={symbol}
-                      className="font-mono text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex items-center justify-center"
+                      className="font-mono relative text-black p-2 border-2 border-black bg-gray-200 text-center m-5 flex items-center justify-center"
                       style={{ width: "8rem", height: "8rem" }}
                     >
                       <p>
@@ -121,7 +121,7 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
                         onClick={() => {
                           navigator.clipboard.writeText(convertedAmounts[symbol]);
                         }}
-                        className="btn relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg bg-gray-900 text-center align-middle font-sans text-xs font-medium uppercase text-white shadow-md shadow-gray-900/10 transition-all hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                        className="btn absolute top-0 right-0 h-3 max-h-[40px] w-3 max-w-[40px] select-none text-center bg-transparent rounded-none border-none align-middle font-sans text-xs font-medium uppercase text-white transition-all"
                         type="button"
                       >
                         <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
@@ -132,7 +132,7 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
                             stroke-width="1.5"
                             stroke="currentColor"
                             aria-hidden="true"
-                            className="w-5 h-5 text-white"
+                            className="w-4 h-4 text-black"
                           >
                             <path
                               stroke-linecap="round"
