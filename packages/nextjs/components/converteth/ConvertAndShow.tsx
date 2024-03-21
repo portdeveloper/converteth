@@ -61,7 +61,7 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
   // Effect to update LocalStorage when preferences change
   useEffect(() => {
     setLocalStoredvalue({ baseCurrency: selectedCurrency, displayedCoins, amount });
-  }, [selectedCurrency, displayedCoins, amount]);
+  }, [selectedCurrency, displayedCoins, amount, setLocalStoredvalue]);
 
   return (
     <div className="container mx-auto px-4 mt-8">
@@ -80,6 +80,7 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
               type="number"
               value={amount}
               onChange={e => setAmount(e.target.value)}
+              min="0"
               placeholder="Enter amount"
               className="p-2 z-50 border-2 border-black bg-white text-black mb-4 mt-16"
             />
