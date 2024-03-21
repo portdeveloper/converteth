@@ -56,7 +56,6 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
               alt="converteth"
               width={300}
               height={150}
-              objectFit="contain"
               className="absolute -top-36 left-0"
             />
             <input
