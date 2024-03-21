@@ -80,11 +80,10 @@ export const ConvertAndShow = ({ data }: ConvertAndShowProps) => {
             <div className="text-black p-2 text-center border-2 border-black bg-gray-200 mb-4">
               {selectedCurrency}: ${prices[selectedCurrency]}
             </div>
-            <label>add coin to show</label>
             <select
               onChange={e => addCoinToShow(e.target.value)}
               className="p-2 bg-white text-black font-mono border-2 border-black "
-              defaultValue=""
+              value={""}
             >
               <option value="" disabled>
                 Add coin to show
